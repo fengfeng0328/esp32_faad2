@@ -1348,9 +1348,14 @@ static int faad_main(int argc, char *argv[])
     if (mp4file)
     {
     	printf("\ndecodeMP4file parameter:\n");
-    	printf("aacFileName:\t\t%s\n",aacFileName);		// 相当于input文件路径
-    	printf("audioFileName:\t\t%s\n",audioFileName);	// 相当于output文件路径
-    	printf("adtsFileName:\t\t%s\n",adtsFileName);
+
+		if (aacFileName != NULL)
+			printf("aacFileName:\t\t%s\n", aacFileName);		// 相当于input文件路径
+		if (audioFileName != NULL)
+			printf("audioFileName:\t\t%s\n", audioFileName);	// 相当于output文件路径
+		if (adtsFileName != NULL)
+			printf("adtsFileName:\t\t%s\n", adtsFileName);
+
     	printf("writeToStdio:\t\t%d\n",writeToStdio);
     	printf("outputFormat:\t\t%d\n",outputFormat);
     	printf("format:\t\t\t%d\n",format);
