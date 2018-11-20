@@ -67,6 +67,7 @@ static void* aac_frame_decode(NeAACDecStruct *hDecoder,
 static void create_channel_config(NeAACDecStruct *hDecoder,
                                   NeAACDecFrameInfo *hInfo);
 
+#define PACKAGE_VERSION "2.8.8"
 
 int NeAACDecGetVersion(char **faad_id_string,
                                    char **faad_copyright_string)
