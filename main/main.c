@@ -28,6 +28,13 @@
 ** $Id: main.c,v 1.89 2015/01/19 09:46:12 knik Exp $
 **/
 
+#include <stdio.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "esp_system.h"
+#include "esp_spi_flash.h"
+#include "sd_card.h"
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -1405,18 +1412,23 @@ static int faad_main(int argc, char *argv[])
     return 0;
 }
 
-int main(int argc, char *argv[])
-{
+void app_main() {
 #if defined WIN32 || defined _WIN32 || defined WIN64 || defined _WIN64
-    int argc_utf8, exit_code;
-    char **argv_utf8;
-    init_console_utf8(stderr);
-    init_commandline_arguments_utf8(&argc_utf8, &argv_utf8);
-    exit_code = faad_main(argc_utf8, argv_utf8);
-    free_commandline_arguments_utf8(&argc_utf8, &argv_utf8);
-    uninit_console_utf8();
-    return exit_code;
+	int argc_utf8, exit_code;
+	char **argv_utf8;
+	init_console_utf8(stderr);
+	init_commandline_arguments_utf8(&argc_utf8, &argv_utf8);
+	exit_code = faad_main(argc_utf8, argv_utf8);
+	free_commandline_arguments_utf8(&argc_utf8, &argv_utf8);
+	uninit_console_utf8();
+	return exit_code;
 #else
-    return faad_main(argc, argv);
+	sd_init();
+
+	int argc = 2;
+	char *argv[2];
+	argv[0] = "faad";
+	argv[1] = "/sdcard/m4afile.m4a";
+	faad_main(argc, argv);
 #endif
 }
