@@ -946,7 +946,7 @@ int mp4read_seek(int framenum)
 
 static void mp4info(void)
 {
-    fprintf(stderr, "Modification Time:\t\t%s", mp4time(mp4config.mtime));
+    fprintf(stderr, "Modification Time:\t%s", mp4time(mp4config.mtime));
     fprintf(stderr, "Samplerate:\t\t%d\n", mp4config.samplerate);	// 采样频率
     fprintf(stderr, "Total samples:\t\t%d\n", mp4config.samples);
     fprintf(stderr, "Total channels:\t\t%d\n", mp4config.channels);	// 采样通道
