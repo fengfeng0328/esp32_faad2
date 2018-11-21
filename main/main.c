@@ -1419,7 +1419,7 @@ static void faad_main(void *pvParameters)
     if (aacFileName != NULL)
       free (aacFileName);		// remind free
 
-    return 0;
+    vTaskDelete(NULL);
 }
 
 void app_main() {
