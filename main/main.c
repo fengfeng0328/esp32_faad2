@@ -1434,6 +1434,6 @@ void app_main() {
 	return exit_code;
 #else
 	sd_init();
-	xTaskCreate(&faad_main, "faad_main", 256 * 128, NULL, 4, NULL);
+	xTaskCreate(&faad_main, "faad_main", 1024 * 96, NULL, 4, NULL);
 #endif
 }
