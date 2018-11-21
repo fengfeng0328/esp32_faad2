@@ -1054,8 +1054,13 @@ static int decodeMP4file(char *mp4file, char *sndfile, char *adts_fn, int to_std
     return frameInfo.error;
 }
 
-static int faad_main(int argc, char *argv[])
+static void faad_main(void *pvParameters)
 {
+	int argc = 2;
+	char *argv[2];
+	argv[0] = "faad";
+	argv[1] = "/sdcard/m4afile.m4a";
+
     int result;
     int infoOnly = 0;
     int writeToStdio = 0;
@@ -1429,11 +1434,6 @@ void app_main() {
 	return exit_code;
 #else
 	sd_init();
-
-	int argc = 2;
-	char *argv[2];
-	argv[0] = "faad";
-	argv[1] = "/sdcard/m4afile.m4a";
-	faad_main(argc, argv);
+	xTaskCreate(&faad_main, "faad_main", 256 * 128, NULL, 4, NULL);
 #endif
 }
