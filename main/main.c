@@ -1476,7 +1476,7 @@ void app_main() {
 	sd_init();
 
 	xTaskCreate(&faad_main, "faad_main", 1024 * 96, NULL, 4, NULL);
-	http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Ftest.m4a", NULL);
+	http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", NULL);
 
 //	ESP_LOGW(TAG, "%d: - RAM left %d", __LINE__, esp_get_free_heap_size());		// 系统剩余可用堆大小
 //	ESP_LOGW(TAG, "app_main stack: %d\n", uxTaskGetStackHighWaterMark(NULL));	// 线程剩余可用堆大小
