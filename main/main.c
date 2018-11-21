@@ -52,6 +52,7 @@
 #include "AC101.h"
 #include "recoder.h"
 #include "uart.h"
+#include "http.h"
 
 static const char *TAG = "main";
 
