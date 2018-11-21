@@ -733,7 +733,7 @@ static int parse(uint32_t *sizemax)
             return ERR_FAIL;
         }
 
-		printf("tmp:\t\t\t%d\n", tmp);
+//		printf("tmp:\t\t\t%d\n", tmp);
 
         size = tmp;
         if (datain(name, 4) != 4)

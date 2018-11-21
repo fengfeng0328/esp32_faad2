@@ -873,8 +873,8 @@ static int decodeMP4file(char *mp4file, char *sndfile, char *adts_fn, int to_std
         return 1;
     }
 
-    printf("mp4config.asc.buf:\t%s\n", mp4config.asc.buf);
-	printf("mp4config.asc.size:\t%d\n", mp4config.asc.size);
+//	printf("mp4config.asc.buf:\t%s\n", mp4config.asc.buf);
+//	printf("mp4config.asc.size:\t%d\n", mp4config.asc.size);
 	printf("samplerate:\t\t%ld\n", samplerate);
 	printf("channels:\t\t%d\n", channels);
 
