@@ -1077,10 +1077,12 @@ static int decodeMP4file(char *mp4file, char *sndfile, char *adts_fn, int to_std
 
 static void faad_main(void *pvParameters)
 {
-	int argc = 2;
-	char *argv[2];
+	int argc = 4;
+	char *argv[argc];
 	argv[0] = "faad";
-	argv[1] = "/sdcard/m4afile.m4a";
+	argv[1] = "-f";
+	argv[2] = "2";
+	argv[3] = "/sdcard/m4afile.m4a";
 
     int result;
     int infoOnly = 0;
@@ -1474,9 +1476,10 @@ void app_main() {
 	sd_init();
 
 	xTaskCreate(&faad_main, "faad_main", 1024 * 96, NULL, 4, NULL);
+	http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Ftest.m4a", NULL);
 
-	ESP_LOGW(TAG, "%d: - RAM left %d", __LINE__, esp_get_free_heap_size());		// 系统剩余可用堆大小
-	ESP_LOGW(TAG, "app_main stack: %d\n", uxTaskGetStackHighWaterMark(NULL));	// 线程剩余可用堆大小
+//	ESP_LOGW(TAG, "%d: - RAM left %d", __LINE__, esp_get_free_heap_size());		// 系统剩余可用堆大小
+//	ESP_LOGW(TAG, "app_main stack: %d\n", uxTaskGetStackHighWaterMark(NULL));	// 线程剩余可用堆大小
 
 	vTaskDelete(NULL);
 #endif
