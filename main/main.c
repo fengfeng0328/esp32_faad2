@@ -32,8 +32,28 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_system.h"
+#include "esp_log.h"
 #include "esp_spi_flash.h"
+#include "lwip/err.h"
+#include "lwip/sockets.h"
+#include "lwip/sys.h"
+#include "lwip/netdb.h"
+#include "lwip/dns.h"
+#include "nvs_flash.h"
+#include "sdkconfig.h"
+
 #include "sd_card.h"
+#include "simple_wifi.h"
+#include "spiram_fifo.h"
+#include "i2s_hal.h"
+#include "driver/gpio.h"
+#include "driver/i2s.h"
+#include "driver/i2c.h"
+#include "AC101.h"
+#include "recoder.h"
+#include "uart.h"
+
+static const char *TAG = "main";
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1433,7 +1453,30 @@ void app_main() {
 	uninit_console_utf8();
 	return exit_code;
 #else
+	esp_err_t ret = nvs_flash_init();
+	if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+		ESP_ERROR_CHECK(nvs_flash_erase());
+		ret = nvs_flash_init();
+	}
+	ESP_ERROR_CHECK(ret);
+
+#if EXAMPLE_ESP_WIFI_MODE_AP
+//	printf("ESP_WIFI_MODE_AP\n");
+	wifi_init_softap();
+#else
+//	printf("ESP_WIFI_MODE_STA\n");
+	wifi_init_sta();
+#endif /*EXAMPLE_ESP_WIFI_MODE_AP*/
+
+	audio_recorder_AC101_init_44KHZ_16BIT_2CHANNEL();
+	spiRamFifoInit();		// 栈内存，无需考虑释放
 	sd_init();
+
 	xTaskCreate(&faad_main, "faad_main", 1024 * 96, NULL, 4, NULL);
+
+	ESP_LOGW(TAG, "%d: - RAM left %d", __LINE__, esp_get_free_heap_size());		// 系统剩余可用堆大小
+	ESP_LOGW(TAG, "app_main stack: %d\n", uxTaskGetStackHighWaterMark(NULL));	// 线程剩余可用堆大小
+
+	vTaskDelete(NULL);
 #endif
 }
