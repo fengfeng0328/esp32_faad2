@@ -1,0 +1,132 @@
+---------------------
+t1-->t2-->t3 info 
+t4 data           
+---------------------
+
+
+t1:-------------------------------------------------------------------------------------------------------------------
+0000 0000(00000000) - 0001 DB52(  121682) len:121682
+
+GET /eCos%2Fm4atestfile.m4a HTTP/1.1
+Host: ai-thinker.oss-cn-shenzhen.aliyuncs.com
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.92 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.9
+
+HTTP/1.1 200 OK
+Server: AliyunOSS
+Date: Fri, 23 Nov 2018 03:41:11 GMT
+Content-Type: audio/mp4
+Content-Length: 1513713
+Connection: close
+x-oss-request-id: 5BF776D7E940463BD740D6A8
+Accept-Ranges: bytes
+ETag: "97E75BE34E3AF3BA252D880778D518C2"
+Last-Modified: Wed, 21 Nov 2018 07:23:23 GMT
+x-oss-object-type: Normal
+x-oss-hash-crc64ecma: 8067211464441574465
+x-oss-storage-class: Standard
+Content-MD5: l+db404687olLYgHeNUYwg==
+x-oss-server-time: 39
+
+
+t2:-------------------------------------------------------------------------------------------------------------------
+0000 0000(00000000) - 0003 3619(  210457) len:210457
+
+GET /eCos%2Fm4atestfile.m4a HTTP/1.1
+Host: ai-thinker.oss-cn-shenzhen.aliyuncs.com
+Connection: keep-alive
+Accept-Encoding: identity;q=1, *;q=0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.92 Safari/537.36
+Accept: */*
+Referer: http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a
+Accept-Language: zh-CN,zh;q=0.9
+Range: bytes=0-
+
+HTTP/1.1 206 Partial Content
+Server: AliyunOSS
+Date: Fri, 23 Nov 2018 03:41:11 GMT
+Content-Type: audio/mp4
+Content-Length: 1513713
+Connection: keep-alive
+x-oss-request-id: 5BF776D7C84D1C44711F2B54
+Content-Range: bytes 0-1513712/1513713
+Accept-Ranges: bytes
+ETag: "97E75BE34E3AF3BA252D880778D518C2"
+Last-Modified: Wed, 21 Nov 2018 07:23:23 GMT
+x-oss-object-type: Normal
+x-oss-hash-crc64ecma: 8067211464441574465
+x-oss-storage-class: Standard
+Content-MD5: l+db404687olLYgHeNUYwg==
+x-oss-server-time: 4
+
+
+t3:-------------------------------------------------------------------------------------------------------------------
+0016 8000( 1474560) - 0017 18F0( 1513712) len:39153   	
+
+GET /eCos%2Fm4atestfile.m4a HTTP/1.1
+Host: ai-thinker.oss-cn-shenzhen.aliyuncs.com
+Connection: keep-alive
+Accept-Encoding: identity;q=1, *;q=0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.92 Safari/537.36
+Accept: */*
+Referer: http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a
+Accept-Language: zh-CN,zh;q=0.9
+Range: bytes=1474560-1513712
+If-Range: "97E75BE34E3AF3BA252D880778D518C2"
+
+HTTP/1.1 206 Partial Content
+Server: AliyunOSS
+Date: Fri, 23 Nov 2018 03:41:12 GMT
+Content-Type: audio/mp4
+Content-Length: 39153
+Connection: keep-alive
+x-oss-request-id: 5BF776D8EDCFF7FE9A879DC1
+Content-Range: bytes 1474560-1513712/1513713
+Accept-Ranges: bytes
+ETag: "97E75BE34E3AF3BA252D880778D518C2"
+Last-Modified: Wed, 21 Nov 2018 07:23:23 GMT
+x-oss-object-type: Normal
+x-oss-hash-crc64ecma: 8067211464441574465
+x-oss-storage-class: Standard
+x-oss-server-time: 9
+
+
+t4:-------------------------------------------------------------------------------------------------------------------
+0001 E086(  123014) - 0016 7FFF( 1474559) len:1351546
+
+GET /eCos%2Fm4atestfile.m4a HTTP/1.1
+Host: ai-thinker.oss-cn-shenzhen.aliyuncs.com
+Connection: keep-alive
+Accept-Encoding: identity;q=1, *;q=0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.92 Safari/537.36
+Accept: */*
+Referer: http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a
+Accept-Language: zh-CN,zh;q=0.9
+Range: bytes=123014-1474559
+If-Range: "97E75BE34E3AF3BA252D880778D518C2"
+
+HTTP/1.1 206 Partial Content
+Server: AliyunOSS
+Date: Fri, 23 Nov 2018 03:41:12 GMT
+Content-Type: audio/mp4
+Content-Length: 1351546
+Connection: keep-alive
+x-oss-request-id: 5BF776D8EDCFF7FE9A879DF6
+Content-Range: bytes 123014-1474559/1513713
+Accept-Ranges: bytes
+ETag: "97E75BE34E3AF3BA252D880778D518C2"
+Last-Modified: Wed, 21 Nov 2018 07:23:23 GMT
+x-oss-object-type: Normal
+x-oss-hash-crc64ecma: 8067211464441574465
+x-oss-storage-class: Standard
+x-oss-server-time: 2
+
+
+
+
+
+
