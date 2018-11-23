@@ -1,0 +1,5 @@
+1.Write HTTP breakpoint request interface based on esp32
+
+2.Analyze mp4 header structure and extract important information
+
+3.Receive data, use fifo and integrate the whole process
