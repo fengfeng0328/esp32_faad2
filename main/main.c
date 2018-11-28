@@ -1402,7 +1402,7 @@ static void faad_main(void *pvParameters)
     	printf("seekTo:\t\t\t%f\n",seekTo);
 
         result = decodeMP4file(aacFileName, audioFileName, adtsFileName, writeToStdio,
-            outputFormat, format, downMatrix, noGapless, infoOnly, adts_out, &length, seekTo);
+            outputFormat, format, downMatrix, noGapless, infoOnly, adts_out, &length, seekTo);	// 1 2
 
         /* 此处已全部解码完成 */
 
@@ -1482,7 +1482,20 @@ void app_main() {
 	sd_init();
 
 	xTaskCreate(&faad_main, "faad_main", 1024 * 96, NULL, 4, NULL);
-	http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", NULL, 1474560, 1513712, 1);	// 参数不要填错，没有容错性
+//	http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", NULL, 0, 1024, 1);	// 参数不要填错，没有容错性
+
+//	/* HTTP TEST */
+//	http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", NULL, 0, 1024, 1);	// 参数不要填错，没有容错性
+//	http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", NULL, 0, 1024, 1);	// 参数不要填错，没有容错性
+//	http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", NULL, 0, 1024, 1);	// 参数不要填错，没有容错性
+//	http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", NULL, 0, 1024, 1);	// 参数不要填错，没有容错性
+//	http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", NULL, 0, 1024, 1);	// 参数不要填错，没有容错性
+//	http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", NULL, 0, 1024, 1);	// 参数不要填错，没有容错性
+//	http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", NULL, 0, 1024, 1);	// 参数不要填错，没有容错性
+//	http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", NULL, 0, 1024, 1);	// 参数不要填错，没有容错性
+//	http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", NULL, 0, 1024, 1);	// 参数不要填错，没有容错性
+//	http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", NULL, 0, 1024, 1);	// 参数不要填错，没有容错性
+//	http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", NULL, 0, 1024, 1);	// 参数不要填错，没有容错性
 
 //	ESP_LOGW(TAG, "%d: - RAM left %d", __LINE__, esp_get_free_heap_size());		// 系统剩余可用堆大小
 //	ESP_LOGW(TAG, "app_main stack: %d\n", uxTaskGetStackHighWaterMark(NULL));	// 线程剩余可用堆大小
