@@ -944,7 +944,7 @@ static int decodeMP4file(char *mp4file, char *sndfile, char *adts_fn, int to_std
     mp4read_seek(startSampleId);
 
     i2s_start(I2S_NUM_0);
-    for (sampleId = startSampleId; sampleId < mp4config.frame.ents; sampleId++)
+    for (sampleId = startSampleId; sampleId < mp4config.frame.ents; sampleId++)	// 每一帧解码一次
     {
 //    	printf("sampleId:\t\t%ld\n", sampleId);
 
@@ -1481,7 +1481,7 @@ void app_main() {
 	spiRamFifoInit();		// 栈内存，无需考虑释放
 	sd_init();
 
-//	xTaskCreate(&faad_main, "faad_main", 1024 * 96, NULL, 4, NULL);
+	xTaskCreate(&faad_main, "faad_main", 1024 * 96, NULL, 4, NULL);
 	http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", NULL, 1474560, 1513712, 1);	// 参数不要填错，没有容错性
 
 //	ESP_LOGW(TAG, "%d: - RAM left %d", __LINE__, esp_get_free_heap_size());		// 系统剩余可用堆大小

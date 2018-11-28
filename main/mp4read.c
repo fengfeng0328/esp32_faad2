@@ -941,6 +941,9 @@ int mp4read_seek(int framenum)
 
     mp4config.frame.current = framenum;
 
+    printf("mp4read seek:\t%d\n",
+			mp4config.mdatofs + mp4config.frame.data[framenum]);
+
     return ERR_OK;
 }
 
@@ -955,7 +958,7 @@ static void mp4info(void)
     fprintf(stderr, "Max bitrate:\t\t%d\n", mp4config.bitratemax);
     fprintf(stderr, "Average bitrate:\t%d\n", mp4config.bitrateavg);
     fprintf(stderr, "Samples per frame:\t%d\n", mp4config.framesamples);
-    fprintf(stderr, "Frames:\t\t\t%d\n", mp4config.frame.ents);
+    fprintf(stderr, "Frames:\t\t\t%d\n", mp4config.frame.ents);		// 代表一共有多少帧
     fprintf(stderr, "ASC size:\t\t%d\n", mp4config.asc.size);
     fprintf(stderr, "Duration:\t\t%.1f sec\n", (float)mp4config.samples/mp4config.samplerate);
     fprintf(stderr, "Data offset/size:\t%x/%x\n", mp4config.mdatofs, mp4config.mdatsize);
