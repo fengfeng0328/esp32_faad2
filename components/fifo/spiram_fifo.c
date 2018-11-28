@@ -18,6 +18,7 @@
 #include "freertos/task.h"
 #include "freertos/semphr.h"
 #include "freertos/queue.h"
+#include "esp_heap_caps.h"
 
 #include "spiram_fifo.h"
 #include "spiram.h"
@@ -42,8 +43,9 @@ static long fifoOvfCnt, fifoUdrCnt;
 #undef SPIRAMSIZE
 //allocate enough for about one mp3 frame
 //#define SPIRAMSIZE 1850
-#define SPIRAMSIZE 32000
-static char fakespiram[SPIRAMSIZE];
+#define SPIRAMSIZE (200*1024)
+static char *fakespiram = NULL;
+//static char fakespiram[SPIRAMSIZE];
 #define spiRamInit() while(0)
 #define spiRamTest() 1
 #define spiRamWrite(pos, buf, n) memcpy(&fakespiram[pos], buf, n)
@@ -52,6 +54,7 @@ static char fakespiram[SPIRAMSIZE];
 
 //Initialize the FIFO
 int spiRamFifoInit() {
+	fakespiram=(char*)heap_caps_malloc(SPIRAMSIZE, MALLOC_CAP_SPIRAM);
 	fifoRpos=0;
 	fifoWpos=0;
 	fifoFill=0;
