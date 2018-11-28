@@ -55,6 +55,7 @@ static char *fakespiram = NULL;
 //Initialize the FIFO
 int spiRamFifoInit() {
 	fakespiram=(char*)heap_caps_malloc(SPIRAMSIZE, MALLOC_CAP_SPIRAM);
+	if (fakespiram == NULL) return -1;
 	fifoRpos=0;
 	fifoWpos=0;
 	fifoFill=0;
