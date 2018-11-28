@@ -48,7 +48,7 @@ static void get_resp_header(const char *response,struct resp_header *resp){
  * @brief simple http_get
  * see https://github.com/nodejs/http-parser for callback usage
  */
-int http_client_get(char *uri , void *datalen)
+int http_client_get(char *uri , void *datalen ,int Rlen_sta, int Rlen_end, int mode)	// mode 1:use Range  mode 0:no use Range
 {
     url_t *url = url_parse(uri);
 
@@ -97,12 +97,30 @@ int http_client_get(char *uri , void *datalen)
     ESP_LOGI(TAG, "... connected");
     freeaddrinfo(res);
 
-    // write http request
     char *request;
-    if(asprintf(&request, "GET %s HTTP/1.0\r\nHost: %s:%d\r\nUser-Agent: ESP32\r\nAccept: */*\r\n\r\n", url->path, url->host, url->port) < 0)
-    {
-        return ESP_FAIL;
-    }
+	if (mode == 0) {
+		// write http request
+		// char *request;
+		if (asprintf(&request, "GET %s HTTP/1.0\r\n"
+				"Host: %s:%d\r\n"
+				"User-Agent: ESP32\r\n"
+				"Accept: */*\r\n"
+				"\r\n", url->path, url->host, url->port) < 0) {
+			return ESP_FAIL;
+		}
+	} else if (mode != 0) {
+		// write http request
+		// char *request;
+		if (asprintf(&request, "GET %s HTTP/1.0\r\n"
+				"Host: %s:%d\r\n"
+				"User-Agent: ESP32\r\n"
+				"Accept: */*\r\n"
+				"Range: bytes=%d-%d\r\n"
+				"\r\n", url->path, url->host, url->port, Rlen_sta, Rlen_end) < 0) {
+			return ESP_FAIL;
+		}
+	}
+
 
     ESP_LOGI(TAG, "requesting %s", request);
 
@@ -137,7 +155,8 @@ int http_client_get(char *uri , void *datalen)
 	}
 	get_resp_header(response,&resp);
     printf("origin content_length = %ld status_code = %d\n",resp.content_length,resp.status_code);	// 长度和状态保留开发者使用
-	if(resp.status_code!=200||resp.content_length==0){
+	if (((resp.status_code != 200) && (resp.status_code != 206))
+			|| resp.content_length == 0) {
 		return;
 	}
 
@@ -150,7 +169,7 @@ int http_client_get(char *uri , void *datalen)
 	length = 0;
 	do {
 		recved = read(sock, recv_buf, RECV_MAX_LEN_T - 1);
-//		printf("recved:%d\n",recved);
+		printf("recved:%d\n",recved);
 		spiRamFifoWrite(recv_buf, recved);
 		length = length + recved;
 		if (length == resp.content_length)
