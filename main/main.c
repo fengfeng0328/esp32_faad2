@@ -942,6 +942,8 @@ static int decodeMP4file(char *mp4file, char *sndfile, char *adts_fn, int to_std
         startSampleId = (int64_t)(seek_to * mp4config.samplerate / framesize);
 
     mp4read_seek(startSampleId);
+
+    i2s_start(I2S_NUM_0);
     for (sampleId = startSampleId; sampleId < mp4config.frame.ents; sampleId++)
     {
 //    	printf("sampleId:\t\t%ld\n", sampleId);
@@ -958,15 +960,14 @@ static int decodeMP4file(char *mp4file, char *sndfile, char *adts_fn, int to_std
         sample_buffer = NeAACDecDecode(hDecoder, &frameInfo, mp4config.bitbuf.data, mp4config.bitbuf.size);
 
 //		printf("adts_out:\t\t%d\n", adts_out);
-        if (adts_out == 1)
-        {
-            adtsData = MakeAdtsHeader(&adtsDataSize, &frameInfo, 0);
-
-            /* write the adts header */
-            fwrite(adtsData, 1, adtsDataSize, adtsFile);
-
-            fwrite(mp4config.bitbuf.data, 1, frameInfo.bytesconsumed, adtsFile);
-        }
+//		if (adts_out == 1) {
+//			adtsData = MakeAdtsHeader(&adtsDataSize, &frameInfo, 0);
+//
+//			/* write the adts header */
+//			fwrite(adtsData, 1, adtsDataSize, adtsFile);
+//
+//			fwrite(mp4config.bitbuf.data, 1, frameInfo.bytesconsumed, adtsFile);
+//		}
 
         dur = frameInfo.samples / frameInfo.channels;
         decoded += dur;
@@ -1013,7 +1014,7 @@ static int decodeMP4file(char *mp4file, char *sndfile, char *adts_fn, int to_std
                 /* open output file */
                 if(!to_stdout)
                 {
-                    aufile = open_audio_file(sndfile, frameInfo.samplerate, frameInfo.channels,
+                    aufile = open_audio_file(sndfile, frameInfo.samplerate, frameInfo.channels,	// 改写open_audio_file
                         outputFormat, fileType, aacChannelConfig2wavexChannelMask(&frameInfo));
                 } else {
 #ifdef _WIN32
@@ -1032,20 +1033,23 @@ static int decodeMP4file(char *mp4file, char *sndfile, char *adts_fn, int to_std
             first_time = 0;
         }
 
-        percent = min((int)(sampleId*100)/mp4config.frame.ents, 100);
-        if (percent > old_percent)
-        {
-            old_percent = percent;
-            snprintf(percents, MAX_PERCENTS, "%d%% decoding %s.", percent, mp4file);
-            faad_fprintf(stderr, "%s\r", percents);
-#ifdef _WIN32
-            SetConsoleTitle(percents);
-#endif
-        }
+//		percent = min((int )(sampleId * 100) / mp4config.frame.ents, 100);
+//		if (percent > old_percent) {
+//			old_percent = percent;
+//			snprintf(percents, MAX_PERCENTS, "%d%% decoding %s.", percent,
+//					mp4file);
+//			faad_fprintf(stderr, "%s\r", percents);
+//#ifdef _WIN32
+//			SetConsoleTitle(percents);
+//#endif
+//		}
 
         if ((frameInfo.error == 0) && (sample_count > 0) && (!adts_out))
         {
-			int wcnt = write_audio_file(aufile, sample_buffer, sample_count, delay);
+//			int wcnt = write_audio_file(aufile, sample_buffer, sample_count, delay);
+			int wcnt = aufile->bits_per_sample/8;
+			i2s_write_bytes(I2S_NUM_0, sample_buffer, wcnt * sample_count, portMAX_DELAY);
+			printf("i2s write bytes:\t%d\n", wcnt * sample_count);
 //			printf("wcnt:\t\t\t%d\n", wcnt);
 //			printf("sample_count:\t\t%d\n", sample_count);
 //			printf("wlen:\t\t\t%d\n", wcnt * sample_count);
@@ -1059,9 +1063,12 @@ static int decodeMP4file(char *mp4file, char *sndfile, char *adts_fn, int to_std
                 NeAACDecGetErrorMessage(frameInfo.error));
         }
     }
+    printf("decoding over...\n");
+	i2s_stop(I2S_NUM_0);
 
     NeAACDecClose(hDecoder);
 
+//	printf("adts_out:\t\t%d\n", adts_out);
     if (adts_out == 1)
     {
         fclose(adtsFile);
@@ -1399,7 +1406,7 @@ static void faad_main(void *pvParameters)
 
         /* 此处已全部解码完成 */
 
-        printf("length:\t\t\t%f\n",length);
+//		printf("length:\t\t\t%f\n", length);
     } else {
 
     if (readFromStdin == 1) {
@@ -1424,20 +1431,19 @@ static void faad_main(void *pvParameters)
     if (adtsFileName != NULL)
       free (adtsFileName);		// remind free
 
-    if (!result && !infoOnly)
-    {
-#ifdef _WIN32
-        float dec_length = (float)(GetTickCount()-begin)/1000.0;
-        SetConsoleTitle("FAAD");
-#else
-        /* clock() grabs time since the start of the app but when we decode
-           multiple files, each file has its own starttime (begin).
-         */
-        float dec_length = (float)(clock() - begin)/(float)CLOCKS_PER_SEC;
-#endif
-        faad_fprintf(stderr, "Decoding %s took: %5.2f sec. %5.2fx real-time.\n", aacFileName,
-            dec_length, length/dec_length);
-    }
+//	if (!result && !infoOnly) {
+//#ifdef _WIN32
+//		float dec_length = (float)(GetTickCount()-begin)/1000.0;
+//		SetConsoleTitle("FAAD");
+//#else
+//		/* clock() grabs time since the start of the app but when we decode
+//		 multiple files, each file has its own starttime (begin).
+//		 */
+//		float dec_length = (float) (clock() - begin) / (float) CLOCKS_PER_SEC;
+//#endif
+//		faad_fprintf(stderr, "Decoding %s took: %5.2f sec. %5.2fx real-time.\n",
+//				aacFileName, dec_length, length / dec_length);
+//	}
 
     if (aacFileName != NULL)
       free (aacFileName);		// remind free

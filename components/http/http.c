@@ -150,7 +150,7 @@ int http_client_get(char *uri , void *datalen)
 	length = 0;
 	do {
 		recved = read(sock, recv_buf, RECV_MAX_LEN_T - 1);
-		printf("recved:%d\n",recved);
+//		printf("recved:%d\n",recved);
 		spiRamFifoWrite(recv_buf, recved);
 		length = length + recved;
 		if (length == resp.content_length)

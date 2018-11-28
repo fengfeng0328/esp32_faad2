@@ -81,14 +81,15 @@ audio_file *open_audio_file(char *infile, int samplerate, int channels,
         aufile->toStdio = 1;
     } else {
         aufile->toStdio = 0;
-        aufile->sndfile = faad_fopen(infile, "wb");
+        aufile->sndfile = NULL;
+//		aufile->sndfile = faad_fopen(infile, "wb");
     }
 
-    if (aufile->sndfile == NULL)
-    {
-        if (aufile) free(aufile);
-        return NULL;
-    }
+//	if (aufile->sndfile == NULL) {
+//		if (aufile)
+//			free(aufile);
+//		return NULL;
+//	}
 
     if (aufile->fileType == OUTPUT_WAV)
     {
@@ -123,7 +124,7 @@ int write_audio_file(audio_file *aufile, void *sample_buffer, int samples, int o
 
 void close_audio_file(audio_file *aufile)
 {
-    if ((aufile->fileType == OUTPUT_WAV) && (aufile->toStdio == 0))
+    if ((aufile->fileType == OUTPUT_WAV) && (aufile->toStdio == 0))	// 输出PCM文件类型，不会被执行
     {
         fseek(aufile->sndfile, 0, SEEK_SET);
 
@@ -133,8 +134,8 @@ void close_audio_file(audio_file *aufile)
             write_wav_header(aufile);
     }
 
-    if (aufile->toStdio == 0)
-        fclose(aufile->sndfile);
+	if ((aufile->toStdio == 0) && (aufile->sndfile != NULL))	// 已设置 aufile->sndfile = NULL
+		fclose(aufile->sndfile);
 
     if (aufile) free(aufile);
 }
