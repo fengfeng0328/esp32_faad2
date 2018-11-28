@@ -812,7 +812,7 @@ static int moovin(int sizemax)
         {ATOM_NAME, "mdia"},
         {ATOM_DESCENT},
         {ATOM_NAME, "mdhd"},
-        {ATOM_DATA, mdhdin},
+        {ATOM_DATA, mdhdin},	// 采样频率和采样系数
         {ATOM_NAME, "hdlr"},
         {ATOM_DATA, hdlr1in},
         {ATOM_NAME, "minf"},
@@ -825,7 +825,7 @@ static int moovin(int sizemax)
         {ATOM_DATA, stsdin},
         {ATOM_DESCENT},
         {ATOM_NAME, "mp4a"},
-        {ATOM_DATA, mp4ain},
+        {ATOM_DATA, mp4ain},	// 采样通道和采样位数
         {ATOM_DESCENT},
         {ATOM_NAME, "esds"},
         {ATOM_DATA, esdsin},
@@ -835,9 +835,9 @@ static int moovin(int sizemax)
         {ATOM_DATA, sttsin},
         {ATOM_NAME, "stsc"},
         {ATOM_NAME, "stsz"},
-        {ATOM_DATA, stszin},
+        {ATOM_DATA, stszin},	// 记录了音频数据每一帧的偏移地址，和音频数据总帧数
         {ATOM_NAME, "stco"},
-        {ATOM_DATA, stcoin},
+        {ATOM_DATA, stcoin},	// 记录了音频数据的起始偏移地址
         {0}
     };
 

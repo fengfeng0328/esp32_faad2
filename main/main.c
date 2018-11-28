@@ -941,7 +941,7 @@ static int decodeMP4file(char *mp4file, char *sndfile, char *adts_fn, int to_std
     if (seek_to > 0.1)
         startSampleId = (int64_t)(seek_to * mp4config.samplerate / framesize);
 
-    mp4read_seek(startSampleId);
+    mp4read_seek(startSampleId);	// 跳转到音频数据起始地址
 
     i2s_start(I2S_NUM_0);
     for (sampleId = startSampleId; sampleId < mp4config.frame.ents; sampleId++)	// 每一帧解码一次
