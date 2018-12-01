@@ -48,56 +48,54 @@ static void get_resp_header(const char *response,struct resp_header *resp){
  * @brief simple http_get
  * see https://github.com/nodejs/http-parser for callback usage
  */
-int http_client_get(char *uri , void *datalen ,int Rlen_sta, int Rlen_end, int mode)	// mode 1:use Range  mode 0:no use Range
+int http_client_get(char *uri, int fd, int Rlen_sta, int Rlen_end, int mode)// mode 1:use Range  mode 0:no use Range
 {
-    url_t *url = url_parse(uri);
+	url_t *url = url_parse(uri);
 
-    const struct addrinfo hints = {
-        .ai_family = AF_INET,
-        .ai_socktype = SOCK_STREAM,
-    };
-    struct addrinfo *res;
-    struct in_addr *addr;
-    char port_str[6]; // stack allocated
-    snprintf(port_str, 6, "%d", url->port);
+	const struct addrinfo hints = { .ai_family = AF_INET, .ai_socktype =
+			SOCK_STREAM, };
+	struct addrinfo *res;
+	struct in_addr *addr;
+	char port_str[6]; // stack allocated
+	snprintf(port_str, 6, "%d", url->port);
 
-    int err = getaddrinfo(url->host, port_str, &hints, &res);
-    if(err != ESP_OK || res == NULL) {
-        ESP_LOGE(TAG, "DNS lookup failed err=%d res=%p", err, res);
-        return err;
-    }
+	int err = getaddrinfo(url->host, port_str, &hints, &res);
+	if (err != ESP_OK || res == NULL) {
+		ESP_LOGE(TAG, "DNS lookup failed err=%d res=%p", err, res);
+		return err;
+	}
 
-    // print resolved IP
-    addr = &((struct sockaddr_in *)res->ai_addr)->sin_addr;
-    ESP_LOGI(TAG, "DNS lookup succeeded. IP=%s", inet_ntoa(*addr));
+	// print resolved IP
+	addr = &((struct sockaddr_in *) res->ai_addr)->sin_addr;
+	ESP_LOGI(TAG, "DNS lookup succeeded. IP=%s", inet_ntoa(*addr));
 
-    // allocate socket
-    int sock = socket(res->ai_family, res->ai_socktype, 0);
-    if(sock < 0) {
-        ESP_LOGE(TAG, "... Failed to allocate socket.");
-        freeaddrinfo(res);
-    }
-    ESP_LOGI(TAG, "... allocated socket");
+	// allocate socket
+	int sock = socket(res->ai_family, res->ai_socktype, 0);
+	if (sock < 0) {
+		ESP_LOGE(TAG, "... Failed to allocate socket.");
+		freeaddrinfo(res);
+	}
+	ESP_LOGI(TAG, "... allocated socket");
 
+	// connect, retrying a few times
+	char retries = 0;
+	while (connect(sock, res->ai_addr, res->ai_addrlen) != 0) {
+		retries++;
+		ESP_LOGE(TAG, "... socket connect attempt %d failed, errno=%d", retries,
+				errno);
 
-    // connect, retrying a few times
-    char retries = 0;
-    while(connect(sock, res->ai_addr, res->ai_addrlen) != 0) {
-        retries++;
-        ESP_LOGE(TAG, "... socket connect attempt %d failed, errno=%d", retries, errno);
+		if (retries > 5) {
+			ESP_LOGE(TAG, "giving up");
+			close(sock);
+			freeaddrinfo(res);
+			return ESP_FAIL;
+		}
+	}
 
-        if(retries > 5) {
-            ESP_LOGE(TAG, "giving up");
-            close(sock);
-            freeaddrinfo(res);
-            return ESP_FAIL;
-        }
-    }
+	ESP_LOGI(TAG, "... connected");
+	freeaddrinfo(res);
 
-    ESP_LOGI(TAG, "... connected");
-    freeaddrinfo(res);
-
-    char *request;
+	char *request;
 	if (mode == 0) {
 		// write http request
 		// char *request;
@@ -116,76 +114,99 @@ int http_client_get(char *uri , void *datalen ,int Rlen_sta, int Rlen_end, int m
 				"User-Agent: ESP32\r\n"
 				"Accept: */*\r\n"
 				"Range: bytes=%d-%d\r\n"
-				"\r\n", url->path, url->host, url->port, Rlen_sta, Rlen_end) < 0) {
+				"\r\n", url->path, url->host, url->port, Rlen_sta, Rlen_end)
+				< 0) {
 			return ESP_FAIL;
 		}
 	}
 
+	ESP_LOGI(TAG, "requesting %s", request);
 
-    ESP_LOGI(TAG, "requesting %s", request);
+	if (write(sock, request, strlen(request)) < 0) {
+		ESP_LOGE(TAG, "... socket send failed");
+		close(sock);
+	}
 
-    if (write(sock, request, strlen(request)) < 0) {
-        ESP_LOGE(TAG, "... socket send failed");
-        close(sock);
-    }
+	free(request);
+	ESP_LOGI(TAG, "... socket send success");
 
-    free(request);
-    ESP_LOGI(TAG, "... socket send success");
-
-    /****** 读取响应头 ******/
-    char response[4096];
-    memset(response, 0, sizeof(response));
-    int length = 0,mem_size=4096;
-    struct resp_header resp;
-    int ret=0;
-    while (1)	{
-		ret = recv(sock, response+length, 1,0);
-		if(ret<=0)
+	/****** 读取响应头 ******/
+	char response[4096];
+	memset(response, 0, sizeof(response));
+	int length = 0, mem_size = 4096;
+	struct resp_header resp;
+	int ret = 0;
+	while (1) {
+		ret = recv(sock, response + length, 1, 0);
+		if (ret <= 0)
 			break;
 		//找到响应头的头部信息, 两个"\r\n"为分割点
 		int flag = 0;
 		int i;
-		for (i = strlen(response) - 1; response[i] == '\n' || response[i] == '\r'; i--, flag++);
+		for (i = strlen(response) - 1;
+				response[i] == '\n' || response[i] == '\r'; i--, flag++)
+			;
 		if (flag == 4)
 			break;
 		length += ret;
-		if(length>=mem_size-1){
+		if (length >= mem_size - 1) {
 			break;
 		}
 	}
-	get_resp_header(response,&resp);
-    printf("origin content_length = %ld status_code = %d\n",resp.content_length,resp.status_code);	// 长度和状态保留开发者使用
+	get_resp_header(response, &resp);
+	printf("origin content_length = %ld status_code = %d\n",
+			resp.content_length, resp.status_code);	// 长度和状态保留开发者使用
 	if (((resp.status_code != 200) && (resp.status_code != 206))
 			|| resp.content_length == 0) {
 		return;
 	}
 
-    /* 读取主体部分 */
+	FILE *FileCache = NULL;
+	if (fd == 1) {		// w+
+		FILE *hMP4FileCache;
+		hMP4FileCache = fopen("/sdcard/Cache.m4a", "w+");
+		if (!hMP4FileCache) {
+			printf("Error opening file\n");
+			return -1;
+		}
+		FileCache = hMP4FileCache;
+	}
+
+
+	/* 读取主体部分 */
 //	char recv_buf[2048];	// 注意TCP最大长度和字节对齐效率，该长度未发现问题
 	char *recv_buf = (char*) malloc(RECV_MAX_LEN_T);
-    bzero(recv_buf, RECV_MAX_LEN_T);
-    ssize_t recved;
+	bzero(recv_buf, RECV_MAX_LEN_T);
+	ssize_t recved;
 
 	length = 0;
 	do {
 		recved = read(sock, recv_buf, RECV_MAX_LEN_T - 1);
-		printf("recved:%d\n",recved);
-		spiRamFifoWrite(recv_buf, recved);
+		printf("recved:%d\n", recved);
+//		spiRamFifoWrite(recv_buf, recved);
 		length = length + recved;
+
+		if (fd != 0) {
+			fwrite(recv_buf, 1, recved, FileCache);
+		}
+
 		if (length == resp.content_length)
 			break;
 //		if (GET_EVENT_BTN() == DOWN) {
 //			break;
 //		}
 	} while (recved > 0);	// 一定要主动断开，注意实时性
-	printf("length = %d\n",length);
+	printf("length = %d\n", length);
 
 	free(recv_buf);
-    free(url);
+	free(url);
 
-    ESP_LOGI(TAG, "... done reading from socket. Last read return=%d errno=%d", recved, errno);
-    close(sock);
-    ESP_LOGI(TAG, "socket closed");
+	ESP_LOGI(TAG, "... done reading from socket. Last read return=%d errno=%d",
+			recved, errno);
+	close(sock);
+	ESP_LOGI(TAG, "socket closed");
 
-    return 0;
+	if (FileCache != NULL)
+		fclose(FileCache);
+	return 0;
 }

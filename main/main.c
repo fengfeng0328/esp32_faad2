@@ -1481,8 +1481,8 @@ void app_main() {
 	spiRamFifoInit();		// 栈内存，无需考虑释放
 	sd_init();
 
-	xTaskCreate(&faad_main, "faad_main", 1024 * 96, NULL, 4, NULL);
-//	http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", NULL, 0, 1024, 1);	// 参数不要填错，没有容错性
+//	xTaskCreate(&faad_main, "faad_main", 1024 * 96, NULL, 4, NULL);
+	http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", 1, 0, 200 * 1024, 1);	// 参数不要填错，没有容错性
 
 //	/* HTTP TEST */
 //	http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", NULL, 0, 1024, 1);	// 参数不要填错，没有容错性
