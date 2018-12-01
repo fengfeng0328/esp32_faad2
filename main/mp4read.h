@@ -64,3 +64,5 @@ int mp4read_open(char *name);
 int mp4read_seek(int framenum);
 int mp4read_frame(void);
 int mp4read_close(void);
+
+int mdat_find(int *pA, int *pB);

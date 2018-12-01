@@ -748,6 +748,14 @@ static int parse(uint32_t *sizemax)
         if (!memcmp(name, g_atom->data, 4))
         {
             //fprintf(stderr, "OK\n");
+        	if(!memcmp(name, "mdat", 4))
+        	{
+        		printf("--------------------------------\n");
+        		printf("mdat find success\n");
+				printf("addr start:\t%lx\n", apos);
+				printf("addr end:\t%lx\n", apos + size);
+				printf("--------------------------------\n");
+        	}
             break;
         }
         //fprintf(stderr, "\n");
@@ -867,6 +875,11 @@ static int moovin(int sizemax)
     return sizemax;
 }
 
+static creator_t g_mdat[] = {
+    {ATOM_NAME, "mdat"},
+//  {ATOM_DATA, ftypin},
+    {0}
+};
 
 static creator_t g_head[] = {
     {ATOM_NAME, "ftyp"},
@@ -1031,4 +1044,34 @@ int mp4read_open(char *name)
 err:
     mp4read_close();
     return ERR_FAIL;
+}
+
+int mdat_find(int *pA, int *pB)
+{
+	uint32_t atomsize;
+	int ret;
+
+	g_fin = faad_fopen("/sdcard/Cache.m4a", "rb");
+	if (!g_fin)
+	{
+		printf("faad_fopen Error\n");
+		return ERR_FAIL;
+	}
+
+	g_atom = g_mdat;
+	atomsize = INT_MAX;
+
+	if (parse(&atomsize) < 0)
+	{
+		printf("parse Error\n");
+		return ERR_FAIL;
+	}
+
+	if(g_fin!=NULL)
+	{
+		fclose(g_fin);
+		g_fin = NULL;
+	}
+
+	return ERR_OK;
 }
