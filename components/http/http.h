@@ -1,6 +1,14 @@
 #ifndef TL_HTTP_H
 #define TL_HTTP_H
 
+typedef struct {
+	char *uri;
+	int fdtype;
+	int Rlen_sta;
+	int Rlen_end;
+	int mode;
+}Prvdata_T;
+
 /*
  * uri:需要请求的http资源地址	(http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a)
  * fdtype:fopen打开文件的模式 	(0:接收的数据不写入SD卡,1:w+,2:rb+)
@@ -10,5 +18,6 @@
  * */
 
 int http_client_get(char *uri, int fdtype, int Rlen_sta, int Rlen_end, int mode);
+void http_client_get_task(void *pvParameters);
 
 #endif

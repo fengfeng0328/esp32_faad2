@@ -863,7 +863,9 @@ static int decodeMP4file(char *mp4file, char *sndfile, char *adts_fn, int to_std
         faad_fprintf(stderr, "Error opening file: %s\n", mp4file);
         return 1;
     }
-    while(1){vTaskDelay(200 / portTICK_PERIOD_MS);}
+//	while (1) {
+//		vTaskDelay(200 / portTICK_PERIOD_MS);
+//	}
     hDecoder = NeAACDecOpen();	// 返回一个解码器句柄
 
     /* Set configuration */

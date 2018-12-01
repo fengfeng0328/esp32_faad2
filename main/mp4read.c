@@ -16,6 +16,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ****************************************************************************/
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "esp_system.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -758,7 +761,16 @@ static int parse(uint32_t *sizemax)
 				printf("addr end:\t%lx\n", apos + size);
 				printf("--------------------------------\n");
 
-				http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", 1, (int)(apos + size), -1, 1);	// 参数不要填错，没有容错性
+				http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", 2, (int)(apos + size), -1, 1);	// 参数不要填错，没有容错性
+
+				Prvdata_T *requestInfo = (Prvdata_T *) malloc(sizeof(Prvdata_T));
+				requestInfo->uri="http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a";
+				requestInfo->fdtype=2;
+				requestInfo->Rlen_sta=(int)apos;
+				requestInfo->Rlen_end=(int)(apos + size)-1;
+				requestInfo->mode=1;
+
+				xTaskCreate(&http_client_get_task, "http_client_get_task", 1024 * 10, (void*)requestInfo, 4, NULL);
         	}
             break;
         }

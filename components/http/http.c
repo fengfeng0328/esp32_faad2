@@ -234,3 +234,16 @@ int http_client_get(char *uri, int fdtype, int Rlen_sta, int Rlen_end, int mode)
 		fclose(FileCache);
 	return 0;
 }
+
+void http_client_get_task(void *pvParameters) {
+	http_client_get(((Prvdata_T*)pvParameters)->uri,
+			((Prvdata_T*)pvParameters)->fdtype,
+			((Prvdata_T*)pvParameters)->Rlen_sta,
+			((Prvdata_T*)pvParameters)->Rlen_end,
+			((Prvdata_T*)pvParameters)->mode);
+
+	if(pvParameters!=NULL)
+		free(pvParameters);
+
+	vTaskDelete(NULL);
+}
