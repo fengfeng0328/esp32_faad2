@@ -863,7 +863,7 @@ static int decodeMP4file(char *mp4file, char *sndfile, char *adts_fn, int to_std
         faad_fprintf(stderr, "Error opening file: %s\n", mp4file);
         return 1;
     }
-
+    while(1){vTaskDelay(200 / portTICK_PERIOD_MS);}
     hDecoder = NeAACDecOpen();	// 返回一个解码器句柄
 
     /* Set configuration */
@@ -1089,7 +1089,9 @@ static void faad_main(void *pvParameters)
 	argv[0] = "faad";
 	argv[1] = "-f";
 	argv[2] = "2";
-	argv[3] = "/sdcard/m4afile.m4a";
+//	argv[3] = "/sdcard/m4afile.m4a";
+	argv[3] = "/sdcard/Cache.m4a";
+
 
     int result;
     int infoOnly = 0;
@@ -1489,7 +1491,7 @@ void app_main() {
 	mdat_find(&psta, &pend);
 
 
-//	xTaskCreate(&faad_main, "faad_main", 1024 * 96, NULL, 4, NULL);
+	xTaskCreate(&faad_main, "faad_main", 1024 * 96, NULL, 4, NULL);
 
 
 //	/* HTTP TEST */
