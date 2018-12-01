@@ -1481,6 +1481,7 @@ void app_main() {
 	spiRamFifoInit();		// 栈内存，无需考虑释放
 	sd_init();
 
+
 	http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", 1, 0, 200 * 1024, 1);	// 参数不要填错，没有容错性
 
 	int psta = 0;

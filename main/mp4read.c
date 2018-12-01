@@ -27,6 +27,8 @@
 #include "unicode_support.h"
 #include "mp4read.h"
 
+#include "http.h"
+
 enum ATOM_TYPE
 {
     ATOM_STOP = 0 /* end of atoms */ ,
@@ -755,6 +757,8 @@ static int parse(uint32_t *sizemax)
 				printf("addr start:\t%lx\n", apos);
 				printf("addr end:\t%lx\n", apos + size);
 				printf("--------------------------------\n");
+
+				http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", 1, (int)(apos + size), -1, 1);	// 参数不要填错，没有容错性
         	}
             break;
         }

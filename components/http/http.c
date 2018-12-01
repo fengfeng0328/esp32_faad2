@@ -48,7 +48,7 @@ static void get_resp_header(const char *response,struct resp_header *resp){
  * @brief simple http_get
  * see https://github.com/nodejs/http-parser for callback usage
  */
-int http_client_get(char *uri, int fd, int Rlen_sta, int Rlen_end, int mode)// mode 1:use Range  mode 0:no use Range
+int http_client_get(char *uri, int fdtype, int Rlen_sta, int Rlen_end, int mode)// mode 1:use Range  mode 0:no use Range
 {
 	url_t *url = url_parse(uri);
 
@@ -96,7 +96,7 @@ int http_client_get(char *uri, int fd, int Rlen_sta, int Rlen_end, int mode)// m
 	freeaddrinfo(res);
 
 	char *request;
-	if (mode == 0) {
+	if (mode == 0) {	// 非断点请求
 		// write http request
 		// char *request;
 		if (asprintf(&request, "GET %s HTTP/1.0\r\n"
@@ -106,7 +106,7 @@ int http_client_get(char *uri, int fd, int Rlen_sta, int Rlen_end, int mode)// m
 				"\r\n", url->path, url->host, url->port) < 0) {
 			return ESP_FAIL;
 		}
-	} else if (mode != 0) {
+	} else if ((mode != 0) && (Rlen_end != -1)) {
 		// write http request
 		// char *request;
 		if (asprintf(&request, "GET %s HTTP/1.0\r\n"
@@ -115,6 +115,18 @@ int http_client_get(char *uri, int fd, int Rlen_sta, int Rlen_end, int mode)// m
 				"Accept: */*\r\n"
 				"Range: bytes=%d-%d\r\n"
 				"\r\n", url->path, url->host, url->port, Rlen_sta, Rlen_end)
+				< 0) {
+			return ESP_FAIL;
+		}
+	} else if ((mode != 0) && (Rlen_end == -1)) {
+		// write http request
+		// char *request;
+		if (asprintf(&request, "GET %s HTTP/1.0\r\n"
+				"Host: %s:%d\r\n"
+				"User-Agent: ESP32\r\n"
+				"Accept: */*\r\n"
+				"Range: bytes=%d-\r\n"
+				"\r\n", url->path, url->host, url->port, Rlen_sta)
 				< 0) {
 			return ESP_FAIL;
 		}
@@ -162,15 +174,27 @@ int http_client_get(char *uri, int fd, int Rlen_sta, int Rlen_end, int mode)// m
 	}
 
 	FILE *FileCache = NULL;
-	if (fd == 1) {		// w+
+	if (fdtype == 1) {		// w+
 		FILE *hMP4FileCache;
-		hMP4FileCache = fopen("/sdcard/Cache.m4a", "w+");
+		hMP4FileCache = fopen("/sdcard/Cache.m4a", "w+");	// 第一次打开文件
 		if (!hMP4FileCache) {
 			printf("Error opening file\n");
 			return -1;
 		}
 		FileCache = hMP4FileCache;
+		fseek(FileCache, Rlen_sta, SEEK_SET);
+	} else if (fdtype == 2) {
+		FILE *hMP4FileCache;
+		hMP4FileCache = fopen("/sdcard/Cache.m4a", "rb+");	// 非第一次打开
+		if (!hMP4FileCache) {
+			printf("Error opening file\n");
+			return -1;
+		}
+		FileCache = hMP4FileCache;
+		fseek(FileCache, Rlen_sta, SEEK_SET);
 	}
+
+
 
 
 	/* 读取主体部分 */
@@ -186,7 +210,7 @@ int http_client_get(char *uri, int fd, int Rlen_sta, int Rlen_end, int mode)// m
 //		spiRamFifoWrite(recv_buf, recved);
 		length = length + recved;
 
-		if (fd != 0) {
+		if (fdtype != 0) {
 			fwrite(recv_buf, 1, recved, FileCache);
 		}
 
@@ -206,7 +230,7 @@ int http_client_get(char *uri, int fd, int Rlen_sta, int Rlen_end, int mode)// m
 	close(sock);
 	ESP_LOGI(TAG, "socket closed");
 
-	if (FileCache != NULL)
+	if ((fdtype != 0) && (FileCache != NULL))
 		fclose(FileCache);
 	return 0;
 }
