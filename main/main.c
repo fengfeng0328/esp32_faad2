@@ -946,7 +946,7 @@ static int decodeMP4file(char *mp4file, char *sndfile, char *adts_fn, int to_std
 
     mp4read_seek(startSampleId);	// 跳转到音频数据起始地址
 
-    i2s_start(I2S_NUM_0);
+//	i2s_start(I2S_NUM_0);
     for (sampleId = startSampleId; sampleId < mp4config.frame.ents; sampleId++)	// 每一帧解码一次
     {
 //    	printf("sampleId:\t\t%ld\n", sampleId);
@@ -1051,8 +1051,9 @@ static int decodeMP4file(char *mp4file, char *sndfile, char *adts_fn, int to_std
         {
 //			int wcnt = write_audio_file(aufile, sample_buffer, sample_count, delay);
 			int wcnt = aufile->bits_per_sample/8;
-			i2s_write_bytes(I2S_NUM_0, sample_buffer, wcnt * sample_count, portMAX_DELAY);
-			printf("i2s write bytes:\t%d\n", wcnt * sample_count);
+			spiRamFifoWrite(sample_buffer, wcnt * sample_count);
+//			i2s_write_bytes(I2S_NUM_0, sample_buffer, wcnt * sample_count, portMAX_DELAY);
+//			printf("i2s write bytes:\t%d\n", wcnt * sample_count);
 //			printf("wcnt:\t\t\t%d\n", wcnt);
 //			printf("sample_count:\t\t%d\n", sample_count);
 //			printf("wlen:\t\t\t%d\n", wcnt * sample_count);
@@ -1067,7 +1068,7 @@ static int decodeMP4file(char *mp4file, char *sndfile, char *adts_fn, int to_std
         }
     }
     printf("decoding over...\n");
-	i2s_stop(I2S_NUM_0);
+//	i2s_stop(I2S_NUM_0);
 
     NeAACDecClose(hDecoder);
 
@@ -1456,6 +1457,20 @@ static void faad_main(void *pvParameters)
     vTaskDelete(NULL);
 }
 
+static void AudioPlaying(void *pvParameters) {
+
+	i2s_start(I2S_NUM_0);
+	while (1) {
+		char buff[256];
+//		printf("spiRamFifoFill:\t%d\n",spiRamFifoFill());
+		spiRamFifoRead(buff, sizeof(buff));
+		i2s_write_bytes(I2S_NUM_0, buff, sizeof(buff), portMAX_DELAY);
+//		vTaskDelay(10 / portTICK_PERIOD_MS);
+	}
+	i2s_stop(I2S_NUM_0);
+	vTaskDelete(NULL);
+}
+
 void app_main() {
 #if defined WIN32 || defined _WIN32 || defined WIN64 || defined _WIN64
 	int argc_utf8, exit_code;
@@ -1495,6 +1510,7 @@ void app_main() {
 
 
 	xTaskCreate(&faad_main, "faad_main", 1024 * 96, NULL, 4, NULL);
+	xTaskCreate(&AudioPlaying, "AudioPlaying", 1024 * 20, NULL, 5, NULL);
 
 
 //	/* HTTP TEST */
