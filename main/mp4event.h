@@ -1,0 +1,8 @@
+#ifndef MP4EVENT_H
+#define MP4EVENT_H
+
+typedef enum HTTPFALGS {
+	HTTPOPEN,HTTPCLOSE
+} HTTPFLAGS;
+
+#endif
