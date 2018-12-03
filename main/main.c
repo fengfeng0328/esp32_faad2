@@ -53,6 +53,7 @@
 #include "recoder.h"
 #include "uart.h"
 #include "http.h"
+#include "mp4event.h"
 
 static const char *TAG = "main";
 
@@ -1484,7 +1485,7 @@ void app_main() {
 	audio_recorder_AC101_init_44KHZ_16BIT_2CHANNEL();
 	spiRamFifoInit();		// 栈内存，无需考虑释放
 	sd_init();
-
+	mp4Event_Init();
 
 	http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", 1, 0, 200 * 1024, 1);	// 参数不要填错，没有容错性
 

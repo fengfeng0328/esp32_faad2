@@ -21,6 +21,8 @@
 #include "url_parser.h"
 #include "http.h"
 
+#include "mp4event.h"
+
 static const char *TAG="http";
 
 #define RECV_MAX_LEN_T 2048
@@ -50,6 +52,7 @@ static void get_resp_header(const char *response,struct resp_header *resp){
  */
 int http_client_get(char *uri, int fdtype, int Rlen_sta, int Rlen_end, int mode)// mode 1:use Range  mode 0:no use Range
 {
+	SET_HTTPFLAGS(HTTPOPEN);	// HTTP OPEN
 	url_t *url = url_parse(uri);
 
 	const struct addrinfo hints = { .ai_family = AF_INET, .ai_socktype =
@@ -219,6 +222,9 @@ int http_client_get(char *uri, int fdtype, int Rlen_sta, int Rlen_end, int mode)
 //		if (GET_EVENT_BTN() == DOWN) {
 //			break;
 //		}
+		if (GET_HTTPFLAGS() == HTTPCLOSE) {		// HTTP关闭请求
+			break;
+		}
 	} while (recved > 0);	// 一定要主动断开，注意实时性
 	printf("length = %d\n", length);
 
@@ -232,6 +238,8 @@ int http_client_get(char *uri, int fdtype, int Rlen_sta, int Rlen_end, int mode)
 
 	if ((fdtype != 0) && (FileCache != NULL))
 		fclose(FileCache);
+
+	SET_HTTPFLAGS(HTTPEXIT);	// HTTP 状态设置为退出，进行新HTTP请求前需要判断是否处于退出状态
 	return 0;
 }
 
