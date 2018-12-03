@@ -215,6 +215,7 @@ int http_client_get(char *uri, int fdtype, int Rlen_sta, int Rlen_end, int mode)
 
 		if (fdtype != 0) {
 			fwrite(recv_buf, 1, recved, FileCache);
+			pHeadCnt = pHeadCnt + recved;		// addr = pHeadCnt - 1
 		}
 
 		if (length == resp.content_length)

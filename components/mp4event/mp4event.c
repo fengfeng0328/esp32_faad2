@@ -6,6 +6,9 @@
 
 #include "mp4event.h"
 
+int pHeadCnt = 0;
+int pMdatCnt = 0;
+
 static xSemaphoreHandle HTTPFLAGSMUX;
 
 
