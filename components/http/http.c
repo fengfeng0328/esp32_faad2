@@ -53,6 +53,7 @@ static void get_resp_header(const char *response,struct resp_header *resp){
 int http_client_get(char *uri, int fdtype, int Rlen_sta, int Rlen_end, int mode)// mode 1:use Range  mode 0:no use Range
 {
 	SET_HTTPFLAGS(HTTPOPEN);	// HTTP OPEN
+	pHeadCnt = Rlen_sta - 1;	// FILE ADDR
 	url_t *url = url_parse(uri);
 
 	const struct addrinfo hints = { .ai_family = AF_INET, .ai_socktype =
@@ -215,7 +216,7 @@ int http_client_get(char *uri, int fdtype, int Rlen_sta, int Rlen_end, int mode)
 
 		if (fdtype != 0) {
 			fwrite(recv_buf, 1, recved, FileCache);
-			pHeadCnt = pHeadCnt + recved;		// addr = pHeadCnt - 1
+			pHeadCnt = pHeadCnt + recved;
 		}
 
 		if (length == resp.content_length)
