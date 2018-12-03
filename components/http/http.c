@@ -25,7 +25,7 @@
 
 static const char *TAG="http";
 
-#define RECV_MAX_LEN_T 2048
+#define RECV_MAX_LEN_T 4096
 
 struct resp_header{
 	int status_code;//HTTP/1.1 '200' OK
@@ -50,7 +50,7 @@ static void get_resp_header(const char *response,struct resp_header *resp){
  * @brief simple http_get
  * see https://github.com/nodejs/http-parser for callback usage
  */
-int http_client_get(char *uri, int fdtype, int Rlen_sta, int Rlen_end, int mode)// mode 1:use Range  mode 0:no use Range
+int http_client_get(char *uri, int fdtype, int Rlen_sta, int Rlen_end, int mode, int RecvDelay)// mode 1:use Range  mode 0:no use Range
 {
 	SET_HTTPFLAGS(HTTPOPEN);	// HTTP OPEN
 	pHeadCnt = Rlen_sta - 1;	// FILE ADDR
@@ -217,6 +217,9 @@ int http_client_get(char *uri, int fdtype, int Rlen_sta, int Rlen_end, int mode)
 		if (fdtype != 0) {
 			fwrite(recv_buf, 1, recved, FileCache);
 			pHeadCnt = pHeadCnt + recved;
+			if (RecvDelay > 0) {
+				vTaskDelay(RecvDelay / portTICK_PERIOD_MS);
+			}
 		}
 
 		if (length == resp.content_length)
@@ -250,7 +253,8 @@ void http_client_get_task(void *pvParameters) {
 			((Prvdata_T*)pvParameters)->fdtype,
 			((Prvdata_T*)pvParameters)->Rlen_sta,
 			((Prvdata_T*)pvParameters)->Rlen_end,
-			((Prvdata_T*)pvParameters)->mode);
+			((Prvdata_T*)pvParameters)->mode,
+			((Prvdata_T*)pvParameters)->RecvDelay);
 
 	if(pvParameters!=NULL)
 		free(pvParameters);

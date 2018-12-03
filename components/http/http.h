@@ -7,6 +7,7 @@ typedef struct {
 	int Rlen_sta;
 	int Rlen_end;
 	int mode;
+	int RecvDelay;
 }Prvdata_T;
 
 /*
@@ -17,7 +18,7 @@ typedef struct {
  * mode:是否使用断点请求模式 	(1:使用,0:不使用)
  * */
 
-int http_client_get(char *uri, int fdtype, int Rlen_sta, int Rlen_end, int mode);
+int http_client_get(char *uri, int fdtype, int Rlen_sta, int Rlen_end, int mode, int RecvDelay);
 void http_client_get_task(void *pvParameters);
 
 #endif
