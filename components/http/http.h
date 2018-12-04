@@ -21,4 +21,7 @@ typedef struct {
 int http_client_get(char *uri, int fdtype, int Rlen_sta, int Rlen_end, int mode, int RecvDelay);
 void http_client_get_task(void *pvParameters);
 
+int CreateHttpGet_Task(char *uri, int fdtype, int Rlen_sta, int Rlen_end,
+		int mode, int RecvDelay, int usStackDepth, int uxPriority);
+
 #endif

@@ -249,15 +249,36 @@ int http_client_get(char *uri, int fdtype, int Rlen_sta, int Rlen_end, int mode,
 }
 
 void http_client_get_task(void *pvParameters) {
-	http_client_get(((Prvdata_T*)pvParameters)->uri,
-			((Prvdata_T*)pvParameters)->fdtype,
-			((Prvdata_T*)pvParameters)->Rlen_sta,
-			((Prvdata_T*)pvParameters)->Rlen_end,
-			((Prvdata_T*)pvParameters)->mode,
-			((Prvdata_T*)pvParameters)->RecvDelay);
+	http_client_get(((Prvdata_T*) pvParameters)->uri,
+			((Prvdata_T*) pvParameters)->fdtype,
+			((Prvdata_T*) pvParameters)->Rlen_sta,
+			((Prvdata_T*) pvParameters)->Rlen_end,
+			((Prvdata_T*) pvParameters)->mode,
+			((Prvdata_T*) pvParameters)->RecvDelay);
 
-	if(pvParameters!=NULL)
-		free(pvParameters);
+	if (pvParameters != NULL)
+		free(pvParameters);		// 任务完成，释放内存
 
 	vTaskDelete(NULL);
+}
+
+int CreateHttpGet_Task(char *uri, int fdtype, int Rlen_sta, int Rlen_end,
+		int mode, int RecvDelay, int usStackDepth, int uxPriority) {
+	Prvdata_T *requestInfo = NULL;
+	requestInfo = (Prvdata_T *) malloc(sizeof(Prvdata_T));
+	if (NULL == requestInfo) {
+		printf("malloc Error\n");
+		return -1;
+	}
+	requestInfo->uri = uri;
+	requestInfo->fdtype = fdtype;
+	requestInfo->Rlen_sta = Rlen_sta;
+	requestInfo->Rlen_end = Rlen_end;
+	requestInfo->mode = mode;
+	requestInfo->RecvDelay = RecvDelay;
+
+	xTaskCreate(&http_client_get_task, "http_client_get_task", usStackDepth,
+			(void*) requestInfo, uxPriority, NULL);
+
+	return 0;
 }

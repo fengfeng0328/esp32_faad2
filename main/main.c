@@ -1498,24 +1498,38 @@ void app_main() {
 #endif /*EXAMPLE_ESP_WIFI_MODE_AP*/
 
 	audio_recorder_AC101_init_44KHZ_16BIT_2CHANNEL();
-	spiRamFifoInit();		// 栈内存，无需考虑释放
+	spiRamFifoInit();
 	sd_init();
-	mp4Event_Init();
+	if (CreateFile("/sdcard/Cache.m4a", 10240) != 0) {
+		printf("CreateFile Fail\n");
+		esp_restart();
+	}
+	if (mp4Event_Init() != 0) {
+		printf("mp4Event_Init Fail\n");
+		esp_restart();
+	}
 
 	SET_MP4REQUEST(MP4REQUEST_FIRST);
 
-	Prvdata_T *requestInfo = (Prvdata_T *) malloc(sizeof(Prvdata_T));
-	requestInfo->uri ="http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a";
-	requestInfo->fdtype = 1;
-	requestInfo->Rlen_sta = 0;
-	requestInfo->Rlen_end = 200 * 1024;
-	requestInfo->mode = 1;
-	requestInfo->RecvDelay = 0;
-
-	xTaskCreate(&http_client_get_task, "http_client_get_task", 1024 * 10, (void*) requestInfo, 4, NULL);
-	vTaskDelay(200 / portTICK_PERIOD_MS);
+//	Prvdata_T *requestInfo = (Prvdata_T *) malloc(sizeof(Prvdata_T));
+//	requestInfo->uri ="http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a";
+//	requestInfo->fdtype = 1;
+//	requestInfo->Rlen_sta = 0;
+//	requestInfo->Rlen_end = 200 * 1024;
+//	requestInfo->mode = 1;
+//	requestInfo->RecvDelay = 0;
+//
+//	xTaskCreate(&http_client_get_task, "http_client_get_task", 1024 * 10, (void*) requestInfo, 4, NULL);
+//	vTaskDelay(200 / portTICK_PERIOD_MS);
 //	http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", 1, 0, 200 * 1024, 1, 0);	// 参数不要填错，没有容错性
 //	while(1);
+
+	CreateHttpGet_Task(
+			"http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a",
+			1, 0, 200 * 1024, 1, 0, 1024 * 10, 4);
+
+	vTaskDelay(200 / portTICK_PERIOD_MS);
+
 	int psta = 0;
 	int pend = 0;
 	mdat_find(&psta, &pend);

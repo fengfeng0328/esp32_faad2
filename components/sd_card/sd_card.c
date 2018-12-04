@@ -115,4 +115,33 @@ void sd_init(void)
 	// ESP_LOGI(TAG, "Card unmounted");
 }
 
+int CreateFile(char *FileName,int FileSize)
+{
+	FILE *pFile = NULL;
+	char *buff = NULL;
+	buff = (char *) malloc(sizeof(char) * FileSize);
+	if (NULL == buff) {
+		printf("malloc Error\n");
+		return -1;
+	}
+	memset(buff, 0, sizeof(char) * FileSize);
+	pFile = fopen(FileName, "wb+");
+	if (NULL == pFile) {
+		printf("fopen Error\n");
+		return -1; /* 要返回错误代码 */
+	}
+
+	if (fwrite(buff, 1, sizeof(char) * FileSize, pFile)
+			!= sizeof(char) * FileSize) {
+		printf("fwrite Error\n");
+		return -1;
+	}
+	fclose(pFile);
+	pFile = NULL;
+	free(buff);
+	buff = NULL;
+
+	return 0;
+}
+
 
