@@ -53,7 +53,10 @@ static void get_resp_header(const char *response,struct resp_header *resp){
 int http_client_get(char *uri, int fdtype, int Rlen_sta, int Rlen_end, int mode, int RecvDelay)// mode 1:use Range  mode 0:no use Range
 {
 	SET_HTTPFLAGS(HTTPOPEN);	// HTTP OPEN
-	pHeadCnt = Rlen_sta - 1;	// FILE ADDR
+
+	if (GET_MP4REQUEST() == MP4REQUEST_FIRST) {
+		pHeadCnt = Rlen_sta - 1;	// FILE ADDR
+	}
 
 	if (GET_MP4REQUEST() == MP4REQUEST_THIRD) {
 		pMdatCnt = Rlen_sta - 1;
@@ -220,8 +223,14 @@ int http_client_get(char *uri, int fdtype, int Rlen_sta, int Rlen_end, int mode,
 		length = length + recved;
 
 		if (fdtype != 0) {
-			fwrite(recv_buf, 1, recved, FileCache);
-			pHeadCnt = pHeadCnt + recved;
+			if (fwrite(recv_buf, 1, recved, FileCache) != recved) {
+				printf("fwrite Error\n");
+				return -1;
+			}
+
+			if (GET_MP4REQUEST() == MP4REQUEST_FIRST) {
+				pHeadCnt = pHeadCnt + recved;
+			}
 			if (GET_MP4REQUEST() == MP4REQUEST_THIRD) {
 				pMdatCnt = pMdatCnt + recved;
 			}
