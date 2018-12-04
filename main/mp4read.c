@@ -727,6 +727,16 @@ static int parse(uint32_t *sizemax)
         char name[4];
         uint32_t tmp;
 
+		if (GET_MP4REQUEST() == MP4REQUEST_FIRST) {
+			while (1) {
+				if (pHeadCnt < 7) {
+					vTaskDelay(20 / portTICK_PERIOD_MS);
+				} else {
+					break;
+				}
+			}
+		}
+
         apos = ftell(g_fin);		// ftell 用于得到文件位置指针当前位置相对于文件首的偏移字节数
 		printf("apos=\t%lx\n", apos);
         if (apos >= (aposmax - 8))

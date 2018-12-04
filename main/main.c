@@ -1513,7 +1513,7 @@ void app_main() {
 	requestInfo->RecvDelay = 0;
 
 	xTaskCreate(&http_client_get_task, "http_client_get_task", 1024 * 10, (void*) requestInfo, 4, NULL);
-	vTaskDelay(100 / portTICK_PERIOD_MS);
+	vTaskDelay(200 / portTICK_PERIOD_MS);
 //	http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", 1, 0, 200 * 1024, 1, 0);	// 参数不要填错，没有容错性
 //	while(1);
 	int psta = 0;
