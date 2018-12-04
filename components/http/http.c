@@ -180,7 +180,7 @@ int http_client_get(char *uri, int fdtype, int Rlen_sta, int Rlen_end, int mode,
 	FILE *FileCache = NULL;
 	if (fdtype == 1) {		// w+
 		FILE *hMP4FileCache;
-		hMP4FileCache = fopen("/sdcard/Cache.m4a", "wb+");	// 第一次打开文件
+		hMP4FileCache = fopen("/sdcard/Cache.m4a", "rb+");	// 第一次打开文件
 		if (!hMP4FileCache) {
 			printf("Error opening file\n");
 			return -1;

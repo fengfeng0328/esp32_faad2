@@ -728,6 +728,7 @@ static int parse(uint32_t *sizemax)
         uint32_t tmp;
 
         apos = ftell(g_fin);		// ftell 用于得到文件位置指针当前位置相对于文件首的偏移字节数
+		printf("apos=\t%lx\n", apos);
         if (apos >= (aposmax - 8))
         {
             fprintf(stderr, "parse error: atom '%s' not found\n", (char *)g_atom->data);
@@ -739,7 +740,7 @@ static int parse(uint32_t *sizemax)
             return ERR_FAIL;
         }
 
-//		printf("tmp:\t\t\t%d\n", tmp);
+		printf("tmp:\t%x\n", tmp);
 
         size = tmp;
         if (datain(name, 4) != 4)
@@ -762,6 +763,17 @@ static int parse(uint32_t *sizemax)
 				printf("addr end:\t%lx\n", apos + size);
 				printf("--------------------------------\n");
 
+				SET_HTTPFLAGS(HTTPCLOSE);
+				while(1)
+				{
+					if (GET_HTTPFLAGS() != HTTPEXIT) {
+						vTaskDelay(20 / portTICK_PERIOD_MS);
+					} else {
+						break;
+					}
+				}
+
+
 				SET_MP4REQUEST(MP4REQUEST_SECOND);
 				http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", 2, (int)(apos + size), -1, 1, 0);	// 参数不要填错，没有容错性
 
@@ -780,17 +792,17 @@ static int parse(uint32_t *sizemax)
         }
         //fprintf(stderr, "\n");
 
-//		if (GET_MP4REQUEST() == MP4REQUEST_FIRST) {
-//			while (1) {
-//				if (pHeadCnt < apos + size + 64) {
-////					printf("pHeadCnt=%d\n",pHeadCnt);
-////					printf("p=%d\n",(int)(apos+size+64));
-//					vTaskDelay(100 / portTICK_PERIOD_MS);
-//				} else {
-//					break;
-//				}
-//			}
-//		}
+		if (GET_MP4REQUEST() == MP4REQUEST_FIRST) {
+			while (1) {
+				if (pHeadCnt < apos + size + 64) {
+//					printf("pHeadCnt=%d\n",pHeadCnt);
+//					printf("p=%d\n",(int)(apos+size+64));
+					vTaskDelay(100 / portTICK_PERIOD_MS);
+				} else {
+					break;
+				}
+			}
+		}
 
         fseek(g_fin, apos + size, SEEK_SET);
     }
