@@ -1502,11 +1502,11 @@ void app_main() {
 	sd_init();
 	if (CreateFile("/sdcard/Cache.m4a", 10240) != 0) {
 		printf("CreateFile Fail\n");
-		esp_restart();
+		goto err;
 	}
 	if (mp4Event_Init() != 0) {
 		printf("mp4Event_Init Fail\n");
-		esp_restart();
+		goto err;
 	}
 
 	SET_MP4REQUEST(MP4REQUEST_FIRST);
@@ -1524,15 +1524,17 @@ void app_main() {
 //	http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", 1, 0, 200 * 1024, 1, 0);	// 参数不要填错，没有容错性
 //	while(1);
 
-	CreateHttpGet_Task(
+	if(CreateHttpGet_Task(
 			"http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a",
-			1, 0, 200 * 1024, 1, 0, 1024 * 10, 4);
+			1, 0, 200 * 1024, 1, 0, 1024 * 10, 4)!=0)
+	{
+		printf("CreateHttpGet_Task Fail\n");
+		goto err;
+	}
 
 	vTaskDelay(200 / portTICK_PERIOD_MS);
 
-	int psta = 0;
-	int pend = 0;
-	mdat_find(&psta, &pend);
+	mdat_find();
 
 
 	xTaskCreate(&faad_main, "faad_main", 1024 * 96, NULL, 4, NULL);
@@ -1555,6 +1557,7 @@ void app_main() {
 //	ESP_LOGW(TAG, "%d: - RAM left %d", __LINE__, esp_get_free_heap_size());		// 系统剩余可用堆大小
 //	ESP_LOGW(TAG, "app_main stack: %d\n", uxTaskGetStackHighWaterMark(NULL));	// 线程剩余可用堆大小
 
+err:
 	vTaskDelete(NULL);
 #endif
 }

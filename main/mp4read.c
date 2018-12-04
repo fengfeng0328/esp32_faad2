@@ -1100,7 +1100,7 @@ err:
     return ERR_FAIL;
 }
 
-int mdat_find(int *pA, int *pB)
+int mdat_find()
 {
 	uint32_t atomsize;
 	int ret;
