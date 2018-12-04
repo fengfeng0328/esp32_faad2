@@ -993,6 +993,14 @@ int mp4read_frame(void)
     mp4config.bitbuf.size = mp4config.frame.data[mp4config.frame.current + 1]
         - mp4config.frame.data[mp4config.frame.current];
 
+	while (1) {
+		if (pMdatCnt < ftell(g_fin) + mp4config.bitbuf.size) {
+			vTaskDelay(20 / portTICK_PERIOD_MS);
+		} else {
+			break;
+		}
+	}
+
     /* 每一帧原始数据大小是不一致的，这里可以直接从fifo读取 */
     if (fread(mp4config.bitbuf.data, 1, mp4config.bitbuf.size, g_fin)
         != mp4config.bitbuf.size)

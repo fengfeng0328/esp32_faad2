@@ -54,6 +54,11 @@ int http_client_get(char *uri, int fdtype, int Rlen_sta, int Rlen_end, int mode,
 {
 	SET_HTTPFLAGS(HTTPOPEN);	// HTTP OPEN
 	pHeadCnt = Rlen_sta - 1;	// FILE ADDR
+
+	if (GET_MP4REQUEST() == MP4REQUEST_THIRD) {
+		pMdatCnt = Rlen_sta - 1;
+	}
+
 	url_t *url = url_parse(uri);
 
 	const struct addrinfo hints = { .ai_family = AF_INET, .ai_socktype =
@@ -217,6 +222,9 @@ int http_client_get(char *uri, int fdtype, int Rlen_sta, int Rlen_end, int mode,
 		if (fdtype != 0) {
 			fwrite(recv_buf, 1, recved, FileCache);
 			pHeadCnt = pHeadCnt + recved;
+			if (GET_MP4REQUEST() == MP4REQUEST_THIRD) {
+				pMdatCnt = pMdatCnt + recved;
+			}
 			if (RecvDelay > 0) {
 				vTaskDelay(RecvDelay / portTICK_PERIOD_MS);
 			}
