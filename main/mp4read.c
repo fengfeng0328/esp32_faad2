@@ -32,6 +32,7 @@
 
 #include "http.h"
 #include "mp4event.h"
+#include "mp4List.h"
 
 enum ATOM_TYPE
 {
@@ -783,9 +784,7 @@ static int parse(uint32_t *sizemax)
 				}
 
 				SET_MP4REQUEST(MP4REQUEST_SECOND);
-				http_client_get(
-						"http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a",
-						2, (int) (apos + size), -1, 1, 0);	// 参数不要填错，没有容错性
+				http_client_get(MP4_URL, 2, (int) (apos + size), -1, 1, 0);	// 参数不要填错，没有容错性
 
 //				Prvdata_T *requestInfo = (Prvdata_T *) malloc(sizeof(Prvdata_T));
 //				requestInfo->uri="http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a";
@@ -799,10 +798,8 @@ static int parse(uint32_t *sizemax)
 //				xTaskCreate(&http_client_get_task, "http_client_get_task", 1024 * 10, (void*)requestInfo, 4, NULL);
 
 				SET_MP4REQUEST(MP4REQUEST_THIRD);
-				if (CreateHttpGet_Task(
-						"http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a",
-						2, (int) apos, (int) (apos + size) - 1, 1, 40,
-						1024 * 10, 4) != 0) {
+				if (CreateHttpGet_Task(MP4_URL, 2, (int) apos,
+						(int) (apos + size) - 1, 1, 40, 1024 * 10, 4) != 0) {
 					printf("CreateHttpGet_Task Fail\n");
 					return ERR_FAIL;
 				}

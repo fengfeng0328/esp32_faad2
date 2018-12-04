@@ -54,6 +54,7 @@
 #include "uart.h"
 #include "http.h"
 #include "mp4event.h"
+#include "mp4List.h"
 
 static const char *TAG = "main";
 
@@ -1507,7 +1508,7 @@ void app_main() {
 		printf("sd init Fail\n");
 		goto err;
 	}
-	if (CreateFile("/sdcard/Cache.m4a", 10240) != 0) {
+	if (CreateFile("/sdcard/Cache.m4a", 1024*200) != 0) {
 		printf("CreateFile Fail\n");
 		goto err;
 	}
@@ -1531,10 +1532,8 @@ void app_main() {
 
 	SET_MP4REQUEST(MP4REQUEST_FIRST);
 
-	if(CreateHttpGet_Task(
-			"http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a",
-			1, 0, 200 * 1024, 1, 0, 1024 * 10, 4)!=0)
-	{
+	if (CreateHttpGet_Task(MP4_URL, 1, 0, 400 * 1024, 1, 0, 1024 * 10, 4)
+			!= 0) {
 		printf("CreateHttpGet_Task Fail\n");
 		goto err;
 	}
