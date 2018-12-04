@@ -2,7 +2,7 @@
 #define SD_CARD_H
 
 /* 初始化SD并挂载 */
-void sd_init(void);
+int sd_init(void);
 
 /* FileName	文件名字
  * FileSize 文件大小

@@ -1498,8 +1498,15 @@ void app_main() {
 #endif /*EXAMPLE_ESP_WIFI_MODE_AP*/
 
 	audio_recorder_AC101_init_44KHZ_16BIT_2CHANNEL();
-	spiRamFifoInit();
-	sd_init();
+
+	if (spiRamFifoInit() != 1) {
+		printf("spiRamFifoInit Fail\n");
+		goto err;
+	}
+	if (sd_init() != 0) {
+		printf("sd init Fail\n");
+		goto err;
+	}
 	if (CreateFile("/sdcard/Cache.m4a", 10240) != 0) {
 		printf("CreateFile Fail\n");
 		goto err;
@@ -1508,8 +1515,6 @@ void app_main() {
 		printf("mp4Event_Init Fail\n");
 		goto err;
 	}
-
-	SET_MP4REQUEST(MP4REQUEST_FIRST);
 
 //	Prvdata_T *requestInfo = (Prvdata_T *) malloc(sizeof(Prvdata_T));
 //	requestInfo->uri ="http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a";
@@ -1524,6 +1529,8 @@ void app_main() {
 //	http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", 1, 0, 200 * 1024, 1, 0);	// 参数不要填错，没有容错性
 //	while(1);
 
+	SET_MP4REQUEST(MP4REQUEST_FIRST);
+
 	if(CreateHttpGet_Task(
 			"http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a",
 			1, 0, 200 * 1024, 1, 0, 1024 * 10, 4)!=0)
@@ -1534,8 +1541,13 @@ void app_main() {
 
 	vTaskDelay(200 / portTICK_PERIOD_MS);
 
-	mdat_find();
-
+	if (mdat_find() != 0) {
+		vTaskDelay(200 / portTICK_PERIOD_MS);
+		if (mdat_find() != 0) {
+			printf("mdat find Fail\n");
+			goto err;
+		}
+	}
 
 	xTaskCreate(&faad_main, "faad_main", 1024 * 96, NULL, 4, NULL);
 	xTaskCreate(&AudioPlaying, "AudioPlaying", 1024 * 20, NULL, 5, NULL);

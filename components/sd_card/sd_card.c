@@ -41,7 +41,7 @@ static const char *TAG = "sd_card";
 #define PIN_NUM_CS   13
 #endif //USE_SPI_MODE
 
-void sd_init(void)
+int sd_init(void)
 {
 	ESP_LOGI(TAG, "Initializing SD card");
 
@@ -104,7 +104,7 @@ void sd_init(void)
 					"Make sure SD card lines have pull-up resistors in place.",
 					esp_err_to_name(ret));
 		}
-		return;
+		return -1;
 	}
 
 	// Card has been initialized, print its properties
@@ -113,6 +113,8 @@ void sd_init(void)
 	// All done, unmount partition and disable SDMMC or SPI peripheral
 	// esp_vfs_fat_sdmmc_unmount();
 	// ESP_LOGI(TAG, "Card unmounted");
+
+	return 0;
 }
 
 int CreateFile(char *FileName,int FileSize)
