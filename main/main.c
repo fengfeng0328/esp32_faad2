@@ -1504,8 +1504,18 @@ void app_main() {
 
 	SET_MP4REQUEST(MP4REQUEST_FIRST);
 
+//	Prvdata_T *requestInfo = (Prvdata_T *) malloc(sizeof(Prvdata_T));
+//	requestInfo->uri ="http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a";
+//	requestInfo->fdtype = 1;
+//	requestInfo->Rlen_sta = 0;
+//	requestInfo->Rlen_end = 200 * 1024;
+//	requestInfo->mode = 1;
+//	requestInfo->RecvDelay = 0;
+//
+//	xTaskCreate(&http_client_get_task, "http_client_get_task", 1024 * 10, (void*) requestInfo, 4, NULL);
+//	vTaskDelay(1000 / portTICK_PERIOD_MS);
 	http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", 1, 0, 200 * 1024, 1, 0);	// 参数不要填错，没有容错性
-
+//	while(1);
 	int psta = 0;
 	int pend = 0;
 	mdat_find(&psta, &pend);

@@ -31,6 +31,7 @@
 #include "mp4read.h"
 
 #include "http.h"
+#include "mp4event.h"
 
 enum ATOM_TYPE
 {
@@ -761,6 +762,7 @@ static int parse(uint32_t *sizemax)
 				printf("addr end:\t%lx\n", apos + size);
 				printf("--------------------------------\n");
 
+				SET_MP4REQUEST(MP4REQUEST_SECOND);
 				http_client_get("http://ai-thinker.oss-cn-shenzhen.aliyuncs.com/eCos%2Fm4atestfile.m4a", 2, (int)(apos + size), -1, 1, 0);	// 参数不要填错，没有容错性
 
 				Prvdata_T *requestInfo = (Prvdata_T *) malloc(sizeof(Prvdata_T));
@@ -771,11 +773,24 @@ static int parse(uint32_t *sizemax)
 				requestInfo->mode=1;
 				requestInfo->RecvDelay=40;
 
+				SET_MP4REQUEST(MP4REQUEST_THIRD);
 				xTaskCreate(&http_client_get_task, "http_client_get_task", 1024 * 10, (void*)requestInfo, 4, NULL);
         	}
             break;
         }
         //fprintf(stderr, "\n");
+
+//		if (GET_MP4REQUEST() == MP4REQUEST_FIRST) {
+//			while (1) {
+//				if (pHeadCnt < apos + size + 64) {
+////					printf("pHeadCnt=%d\n",pHeadCnt);
+////					printf("p=%d\n",(int)(apos+size+64));
+//					vTaskDelay(100 / portTICK_PERIOD_MS);
+//				} else {
+//					break;
+//				}
+//			}
+//		}
 
         fseek(g_fin, apos + size, SEEK_SET);
     }
