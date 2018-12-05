@@ -71,14 +71,18 @@ esp_err_t AC101_Write_Reg(uint8_t reg, uint16_t val)
 }
 esp_err_t ac101_set_spk_volume(uint8_t volume)
 {
-	uint16_t res;
-	esp_err_t ret;
-	volume = volume/2;
-	res = AC101_read_Reg(SPKOUT_CTRL);
-	res &= (~0x1f);
-	volume &= 0x1f;
-	res |= volume;
-	ret = AC101_Write_Reg(SPKOUT_CTRL,res);
+	if (volume > 100) {
+		printf("Please Input Volume Between 0 and 100\n");
+		return ESP_FAIL;
+	}
+	uint16_t val = 0;
+	volume = (uint8_t)((float)0x1f / 100 * volume);
+//	printf("volume=%d\n", volume);
+	val = AC101_read_Reg(SPKOUT_CTRL);
+	val &= (~0x1f);		// 清零后5bit
+	volume &= 0x1f;		// 只保留后5bit
+	val |= volume;		// 赋值后5bit
+	esp_err_t ret = AC101_Write_Reg(SPKOUT_CTRL, val);
 	return ret;
 }
 
@@ -332,6 +336,89 @@ void codec_mute(int en)
 	AC101_Write_Reg(0x56,reg_val);
 }
 
+esp_err_t SET_AudioFormats(i2s_port_t i2s_num, uint32_t rate, i2s_bits_per_sample_t bits, i2s_channel_t ch)
+{
+	/* ESP32 SET AudioFormats*/
+	esp_err_t ret = i2s_set_clk(i2s_num, rate, bits, ch);
+	if (ret != ESP_OK) {
+		printf("i2s_set_clk Error\n");
+		return ESP_FAIL;
+	}
+	/* AC101 SET AudioFormats */
+	switch (rate) {
+	case 8000:
+		I2C_CHECK(AC101_Write_Reg(0x06, 0x0), 7)
+		;
+		break;
+	case 11025:
+		I2C_CHECK(AC101_Write_Reg(0x06, 0x1000), 7)
+		;
+		break;
+		I2C_CHECK(AC101_Write_Reg(0x06, 0x2000), 7)
+		;
+		break;
+	case 16000:
+		I2C_CHECK(AC101_Write_Reg(0x06, 0x3000), 7)
+		;
+		break;
+	case 22050:
+		I2C_CHECK(AC101_Write_Reg(0x06, 0x4000), 7)
+		;
+		break;
+	case 24000:
+		I2C_CHECK(AC101_Write_Reg(0x06, 0x5000), 7)
+		;
+		break;
+	case 32000:
+		I2C_CHECK(AC101_Write_Reg(0x06, 0x6000), 7)
+		;
+		break;
+	case 44100:
+		I2C_CHECK(AC101_Write_Reg(0x06, 0x7000), 7)
+		;
+		break;
+	case 48000:
+		I2C_CHECK(AC101_Write_Reg(0x06, 0x8000), 7)
+		;
+		break;
+	default:
+		printf("rate Error\n");
+		return ESP_FAIL;
+	}
+
+	/* 只支持8bit 16bit 24bit */
+	switch (bits) {
+	case I2S_BITS_PER_SAMPLE_8BIT:
+		I2C_CHECK(AC101_Write_Reg(0x10, 0x8840), 8)
+		;
+		break;
+	case I2S_BITS_PER_SAMPLE_16BIT:
+		I2C_CHECK(AC101_Write_Reg(0x10, 0x8850), 8)
+		;
+		break;
+	case I2S_BITS_PER_SAMPLE_24BIT:
+		I2C_CHECK(AC101_Write_Reg(0x10, 0x8870), 8)
+		;
+		break;
+	default:
+		printf("bits Error\n");
+		return ESP_FAIL;
+	}
+
+	if (ch == I2S_CHANNEL_MONO) {
+		I2C_CHECK(AC101_Write_Reg(0x52, 0xc444), 10);
+		I2C_CHECK(AC101_Write_Reg(0x51, 0x2000), 11);// Bit 13: MIC1 Boost stage
+		I2C_CHECK(AC101_Write_Reg(0x40, 0x8000), 12);
+		I2C_CHECK(AC101_Write_Reg(0x50, 0xbbc0), 14);
+	} else if (ch == I2S_CHANNEL_STEREO) {
+		I2C_CHECK(AC101_Write_Reg(0x52, 0xccc4), 10);
+		I2C_CHECK(AC101_Write_Reg(0x51, 0x2020), 11);// Bit 13: MIC1 Boost stage Bit 5: MIC2 Boost stage
+		I2C_CHECK(AC101_Write_Reg(0x40, 0x8000), 12);
+		I2C_CHECK(AC101_Write_Reg(0x50, 0xbbc3), 14);
+	}
+
+	return ESP_OK;
+}
 
 
 

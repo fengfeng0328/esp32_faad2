@@ -25,5 +25,7 @@ void init_gpio_PA(int en);
 void enable_PA(int en);
 void codec_mute(int en);
 
+esp_err_t SET_AudioFormats(i2s_port_t i2s_num, uint32_t rate, i2s_bits_per_sample_t bits, i2s_channel_t ch);
+
 
 #endif /* MAIN_AC101_H_ */

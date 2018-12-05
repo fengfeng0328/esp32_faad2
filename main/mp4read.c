@@ -739,7 +739,7 @@ static int parse(uint32_t *sizemax)
 		}
 
         apos = ftell(g_fin);		// ftell 用于得到文件位置指针当前位置相对于文件首的偏移字节数
-		printf("apos=\t%lx\n", apos);
+//		printf("apos=\t%lx\n", apos);
         if (apos >= (aposmax - 8))
         {
             fprintf(stderr, "parse error: atom '%s' not found\n", (char *)g_atom->data);
@@ -751,7 +751,7 @@ static int parse(uint32_t *sizemax)
             return ERR_FAIL;
         }
 
-		printf("tmp:\t%x\n", tmp);
+//		printf("tmp:\t%x\n", tmp);
 
         size = tmp;
         if (datain(name, 4) != 4)
